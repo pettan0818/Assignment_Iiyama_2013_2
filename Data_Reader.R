@@ -14,14 +14,14 @@ udata=read.csv("sushi3.udata.csv",header=F)
 names(udata)=c("ID","Sex","Age","回答時間","15歳までの県","15歳までの地域","15歳までの東西","今住んでいる県","今住んでいる地域","今住んでいる東西","今と昔が一緒=0")
 
 # アイテム集合Aの各人の好きなもの順
-item_a_ranking=read.csv("sushi3a.5000.10.order.csv")
+item_a_ranking=read.csv("sushi3a.5000.10.order.csv",header=F)
 item_a_ranking=item_a_ranking[,-c(1,2)]
 names(item_a_ranking)=c("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th")
 head(item_a_ranking)
 summary(item_a_ranking)
 
 # アイテム集合Bの各人の好きなもの順
-item_b_ranking=read.csv("sushi3b.5000.10.order.csv")
+item_b_ranking=read.csv("sushi3b.5000.10.order.csv",header=F)
 item_b_ranking=item_b_ranking[,-c(1,2)]
 names(item_b_ranking)=c("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th")
 head(item_b_ranking)

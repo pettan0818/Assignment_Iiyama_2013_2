@@ -18,10 +18,11 @@ item_a_ranking=read.csv("sushi3a.5000.10.order.csv")
 item_a_ranking=item_a_ranking[,-c(1,2)]
 names(item_a_ranking)=c("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th")
 head(item_a_ranking)
+summary(item_a_ranking)
 
 # アイテム集合Bの各人の好きなもの順
 item_b_ranking=read.csv("sushi3b.5000.10.order.csv")
 item_b_ranking=item_b_ranking[,-c(1,2)]
 names(item_b_ranking)=c("1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th")
 head(item_b_ranking)
-
+summary(item_b_ranking)

@@ -1,4 +1,8 @@
+# お呼び出しの方法
+# source("C:/Dropbox/Document/大学授業/C4-飯山ゼミ/+Assignment/Data_Reader.R",encoding="utf-8",echo=T)
+
 # ここはご自分の環境に合わせて変更のこと
+
 
 setwd("C:/Dropbox/Document/大学授業/C4-飯山ゼミ/+Assignment/@Data")
 

@@ -6,6 +6,7 @@ analyzer_session = function(a, b, c, d){
 	return(is.na(a) & is.na(b) & is.na(c) & is.na(d))
 }
 
+```
 
 ```{r Read_Data}
 setwd("C:/Dropbox/Document/大学授業/C4-飯山ゼミ/+Assignment/@data")
@@ -66,3 +67,4 @@ summary(ans_data)
 rank = apply(ans_data[,6:15],2,mean)
 
 names(sort(rank))
+```

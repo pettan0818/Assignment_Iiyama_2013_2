@@ -2,8 +2,29 @@
 
 ```{r Utility}
 # セッション判定(返り値:(BOOL)Interactive = F, Non-Interactive = T)
+# 引数は、各入力データ(sex, age, pref_u15, pref_now)。これらがすべてNAの時スクリプトセッションだと判定する。
 analyzer_session = function(a, b, c, d){	
 	return(is.na(a) & is.na(b) & is.na(c) & is.na(d))
+}
+
+# K近傍法の実処理関数
+# 引数は、元データ、新しく入力されたデータの二つ。
+# 返り値は、同クラスタの人々のデータ
+k_means = function(original, input_data){
+	# ユーザーの特徴量の切り出し
+	# 5001行目のユーザーが今回入力されたデータ
+	user_data = rbind(data[,c(1,2,3,4,5)],input_data)
+	
+	# クラスタリング(8個のクラスタによるK近傍法)執行
+	k_class = kmeans(user_data, 8)
+	cluster_data = k_class$cluster
+	input_cluster = k_class$cluster[5001]
+	cluster_data = cluster_data[-5001]
+	
+	# 同クラスタのデータ抽出
+	same_cluster_users = data[cluster_data == input_cluster,]
+	
+	return(same_cluster_users)
 }
 
 ```
@@ -47,7 +68,12 @@ if (analyzer_session(sex, age, pref_u15, pref_now)){
 	if (pref_u15 == pref_now) equivalent = 0 else equivalent = 1
 }
 
+# New_Client
+#"Sex","Age","pref_u15","pref_now","equivalent"
+input_data = c(sex, age, pref_u15, pref_now, equivalent)
+
 # (Should Remove) Default Nums(Should Remove)
+if(0){
 if (analyzer_session(sex, age, pref_u15, pref_now)){
 	sex = 0
 	age = 1
@@ -55,7 +81,7 @@ if (analyzer_session(sex, age, pref_u15, pref_now)){
 	pref_now = 13
 	equivalent = 0
 	}
-
+}
 ```
 
 ```{r harmony_Filtering}
@@ -66,7 +92,7 @@ ans_data = data[data[,1] == age & data[,2] == sex & data[,3] == pref_u15 & data[
 
 # データベースに一致がないとき、K近傍法で処理する。
 if (nrow(ans_data) == 0){
-	
+	ans_data =  k_means(data, input_data)
 }
 
 summary(ans_data)

@@ -30,7 +30,7 @@ k_means = function(original, input_data){
 ```
 
 ```{r Read_Data}
-setwd("C:/Dropbox/Document/大学授業/C4-飯山ゼミ/+Assignment/@data")
+source("local.r")
 
 # 順位化データの読みこみ
 data = read.csv("udata+aorder_labeled_work.csv", header = T, fileEncoding = 'shift-jis')

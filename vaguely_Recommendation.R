@@ -9,7 +9,7 @@ analyzer_session = function(a, b, c, d){
 # K近傍法の実処理関数
 # 引数は、元データ、新しく入力されたデータの二つ。
 # 返り値は、同クラスタの人々のデータ
-k_means = function(original, input_data){
+k_means = function(original, input_data, cluster = 8){
 	# ユーザーの特徴量の切り出し
 	# 5001行目のユーザーが今回入力されたデータ
 	user_data = rbind(data[,c(1,2,3,4,5)],input_data)
@@ -26,7 +26,7 @@ k_means = function(original, input_data){
 	return(same_cluster_users)
 }
 ##############################################################
-source("local.r",encoding='utf-8')
+source("../local.r",encoding='utf-8')
 
 # 順位化データの読みこみ
 data = read.csv("udata+aorder_labeled_work.csv", header = T, fileEncoding = 'shift-jis')
@@ -78,13 +78,13 @@ if (analyzer_session(sex, age, pref_u15, pref_now)){
 
 # subset関数、条件指定時に単純条件演算子を使うこと
 # [TODO] Subsetでやりたい 
-ans_data = data[data[,1] == age & data[,2] == sex & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent,]
-#ans_data = subset(data, data[,1] == age & data[,2] == sex & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent)
+ans_data = data[(data[,1] == sex & data[,2] == age & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent),]
+ans_data = subset(data, data[,1] == age & data[,2] == sex & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent)
 
 # データベースに一致がないとき、K近傍法で処理する。
 if (nrow(ans_data) == 0){
 	print("Using K_means...")
-	ans_data =  k_means(data, input_data)
+	ans_data =  k_means(data, input_data, 4)
 }
 
 print(summary(ans_data))

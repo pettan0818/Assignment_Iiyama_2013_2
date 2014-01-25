@@ -79,7 +79,7 @@ if (analyzer_session(sex, age, pref_u15, pref_now)){
 # subset関数、条件指定時に単純条件演算子を使うこと
 # [TODO] Subsetでやりたい 
 ans_data = data[(data[,1] == sex & data[,2] == age & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent),]
-ans_data = subset(data, data[,1] == age & data[,2] == sex & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent)
+ans_data = subset(data, data[,1] == sex & data[,2] == age & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent)
 
 # データベースに一致がないとき、K近傍法で処理する。
 if (nrow(ans_data) == 0){

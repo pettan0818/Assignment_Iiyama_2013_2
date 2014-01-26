@@ -15,9 +15,15 @@ k_means = function(original, input_data, cluster = 8){
 	user_data = rbind(data[,c(1,2,3,4,5)],input_data)
 	
 	# クラスタリング(8個のクラスタによるK近傍法)執行
-	k_class = kmeans(user_data, 8)
+	# 与えられたデータをデータベースに追加した上で、分類実行。
+	k_class = kmeans(user_data, cluster)
 	cluster_data = k_class$cluster
+	# For Debug
+	print(head(cluster_data,100))
+	print(table(cluster_data))
+	# 与えられたデータのクラスタ番号のみ抽出
 	input_cluster = k_class$cluster[5001]
+	# 元々のデータのクラスタ番号を抽出
 	cluster_data = cluster_data[-5001]
 	
 	# 同クラスタのデータ抽出
@@ -65,32 +71,23 @@ if (pref_u15 == pref_now) equivalent = 0 else equivalent = 1
 #"Sex","Age","pref_u15","pref_now","equivalent"
 input_data = c(sex, age, pref_u15, pref_now, equivalent)
 
-# (Should Remove) Default Nums(Should Remove)
-if(0){
-if (analyzer_session(sex, age, pref_u15, pref_now)){
-	sex = 0
-	age = 1
-	pref_u15 = 13
-	pref_now = 13
-	equivalent = 0
-	}
-}
-
 # subset関数、条件指定時に単純条件演算子を使うこと
-# [TODO] Subsetでやりたい 
-ans_data = data[(data[,1] == sex & data[,2] == age & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent),]
-ans_data = subset(data, data[,1] == sex & data[,2] == age & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent)
+# Subsetへの入力は、最初から論理式にする必要がある模様。
+terms = data[,1] == sex & data[,2] == age & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent
+ans_data = data[data[,1] == sex & data[,2] == age & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent,]
+# ans_data = subset(data, terms, select = 6:15)
 
 # データベースに一致がないとき、K近傍法で処理する。
 if (nrow(ans_data) == 0){
 	print("Using K_means...")
-	ans_data =  k_means(data, input_data, 4)
+	ans_data =  k_means(data, input_data, 10)
 }
 
 print(summary(ans_data))
 
+# アルゴリズム適用部
 rank = apply(ans_data[,6:15],2,mean)
 # 最頻値を求めてみた。
-rank = apply(ans_data[,6,15],2,table)
+# rank = apply(ans_data,2,table)
 
 print(names(sort(rank)))

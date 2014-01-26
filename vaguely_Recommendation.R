@@ -80,7 +80,7 @@ ans_data = data[data[,1] == sex & data[,2] == age & data[,3] == pref_u15 & data[
 # データベースに一致がないとき、K近傍法で処理する。
 if (nrow(ans_data) == 0){
 	print("Using K_means...")
-	ans_data =  k_means(data, input_data, 10)
+	ans_data =  k_means(data, input_data, 8)
 }
 
 print(summary(ans_data))

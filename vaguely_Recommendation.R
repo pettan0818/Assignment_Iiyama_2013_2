@@ -41,7 +41,7 @@ data = read.csv("udata+aorder_labeled_work.csv", header = T, fileEncoding = 'shi
 use_column = c(3, 4, 6, 9, 12, 13:22)
 
 data = data[,use_column]
-colnames(data) = c("Sex","Age","pref_u15","pref_now","equivalent","shrimp","conger_eel","tuna","squid","sea_urchin","salmon_roe","egg","fatty flesh","tuna_roll","cucumber")
+colnames(data) = c("sex","age","pref_u15","pref_now","equivalent","shrimp","conger_eel","tuna","squid","sea_urchin","salmon_roe","egg","fatty flesh","tuna_roll","cucumber")
 head(data)
 
 # If this Session is non-interactive session, I'll use arguments.
@@ -73,8 +73,8 @@ input_data = c(sex, age, pref_u15, pref_now, equivalent)
 
 # subset関数、条件指定時に単純条件演算子を使うこと
 # Subsetへの入力は、最初から論理式にする必要がある模様。
-terms = data[,1] == sex & data[,2] == age & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent
-ans_data = data[data[,1] == sex & data[,2] == age & data[,3] == pref_u15 & data[,4] == pref_now & data[,5] == equivalent,]
+terms = data[,1] == input_data[1] & data[,2] == input_data[2] & data[,3] == input_data[3] & data[,4] == input_data[4] & data[,5] == equivalent
+ans_data = data[terms,]
 # ans_data = subset(data, terms, select = 6:15)
 
 # データベースに一致がないとき、K近傍法で処理する。

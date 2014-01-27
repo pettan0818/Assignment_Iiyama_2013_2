@@ -2,8 +2,24 @@
 
 # This file only includes test method...
 # Object Algorithm
-testing_Algo = function(){
+# 
+testing_Algo = function(input_data, data){
+	# 取り出しは、全部一致
+	terms = data[,1] == input_data[1] & data[,2] == input_data[2] & data[,3] == input_data[3] & data[,4] == input_data[4] & data[,5] == input_data["equivalent"]
+	ans_data = data[terms,]
 	
+	# データベースに一致がないとき、K近傍法で処理する。
+	if (nrow(ans_data) == 0){
+		warning("[Attention] Found 0 Consensus, Using K_means...")
+		ans_data =  k_means(data, input_data, 8)
+	}
+	
+	print(summary(ans_data))
+	
+	# アルゴリズム適用部
+	rank = apply(ans_data[,6:15],2,mean)
+	
+	return(rank)
 }
 
 # Utility Functions
@@ -31,8 +47,8 @@ analyzer_session = function(a, b, c, d){
 k_means = function(original, input_data, cluster = 8){
 	# ユーザーの特徴量の切り出し
 	# 元々のデータ+1行目のユーザーが今回入力されたデータ
-	user_data = rbind(data[,c(1,2,3,4,5)],input_data)
-	user_data_row = nrow(data)+1
+	user_data = rbind(original[,c(1,2,3,4,5)],input_data)
+	user_data_row = nrow(original)+1
 	
 	# クラスタリング(8個のクラスタによるK近傍法)執行
 	# 与えられたデータをデータベースに追加した上で、分類実行。
@@ -101,7 +117,5 @@ if(with_test_flag) {
 for(i in 1:nrow(data_sampled)){
 	input_data = data_sampled[i, 1:5]
 	# アルゴリズムを分離して、テスト恒常性を高める。
-	
-	
+	testing_Algo(input_data, data)
 }
-

@@ -44,14 +44,17 @@ data = data[,use_column]
 colnames(data) = c("sex","age","pref_u15","pref_now","equivalent","shrimp","conger_eel","tuna","squid","sea_urchin","salmon_roe","egg","fatty flesh","tuna_roll","cucumber")
 head(data)
 
+input_data = rep(-1, 5)
+names(input_data) = c("sex", "age", "pref_u15", "pref_now", "equivalent")
+
 # If this Session is non-interactive session, I'll use arguments.
-sex = as.integer(readline(prompt = "Please, Enter your Sex...(M = 0, F = 1)> "))
+input_data["sex"] = as.integer(readline(prompt = "Please, Enter your Sex...(M = 0, F = 1)> "))
 
-age = as.integer(readline(prompt = "Please, Enter your Age...(-20 = 0, 20- = 1, 30- = 2, 40- = 3, 50- = 4, 60- = 5)> "))
+input_data["age"] = as.integer(readline(prompt = "Please, Enter your Age...(-20 = 0, 20- = 1, 30- = 2, 40- = 3, 50- = 4, 60- = 5)> "))
 
-pref_u15 = as.integer(readline(prompt = "Please Enter where had you lived in? (Answer in Pref Number)> "))
+input_data["pref_u15"] = as.integer(readline(prompt = "Please Enter where had you lived in? (Answer in Pref Number)> "))
 
-pref_now = as.integer(readline(prompt = "Please Enter where do you live in? (Answer in Pref Number)> "))
+input_data["pref_now"] = as.integer(readline(prompt = "Please Enter where do you live in? (Answer in Pref Number)> "))
 
 # [TODO]: 値域による異常値の削除
 
@@ -66,10 +69,6 @@ if (analyzer_session(sex, age, pref_u15, pref_now)){
 
 # 今と昔が一緒.0の自動設定
 if (pref_u15 == pref_now) equivalent = 0 else equivalent = 1
-
-# New_Client
-#"Sex","Age","pref_u15","pref_now","equivalent"
-input_data = c(sex, age, pref_u15, pref_now, equivalent)
 
 # subset関数、条件指定時に単純条件演算子を使うこと
 # Subsetへの入力は、最初から論理式にする必要がある模様。

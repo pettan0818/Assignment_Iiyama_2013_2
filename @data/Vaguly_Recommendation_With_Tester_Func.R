@@ -5,7 +5,8 @@
 # 
 testing_Algo = function(input_data, data){
 	# 取り出しは、全部一致
-	terms = data[,1] == input_data[1] & data[,2] == input_data[2] & data[,3] == input_data[3] & data[,4] == input_data[4] & data[,5] == input_data["equivalent"]
+	# [FIXME] なんかおかしいぞ
+	terms = (data[,1] == input_data[1]) & (data[,2] == input_data[2]) & (data[,3] == input_data[3]) & (data[,4] == input_data[4]) & (data[,5] == input_data["equivalent"])
 	ans_data = data[terms,]
 	
 	# データベースに一致がないとき、K近傍法で処理する。
@@ -17,9 +18,13 @@ testing_Algo = function(input_data, data){
 	print(summary(ans_data))
 	
 	# アルゴリズム適用部
-	rank = apply(ans_data[,6:15],2,mean)
+	ranked = apply(ans_data[,6:15],2,mean)
 	
-	return(rank)
+	# それぞれのネタに順位番号を格納。
+	returner_ranked = c(1:10)
+	returner_ranked[sort.int(ranked, index.return=T)$ix] = 1:10
+	
+	return(ranked)
 }
 
 # Utility Functions
@@ -119,7 +124,10 @@ result = data.frame()
 for (i in 1:3){
 	input_data = data_sampled[i, 1:5]
 	# アルゴリズムを分離して、テスト恒常性を高める。
+	# result変数に、毎回の順位を格納。
 	result = rbind(result, testing_Algo(input_data, data))
-	# Result Viewer
 }
-print(result)
+
+# Result Viewer
+# コラムデータが化けるので、リセット
+colnames(result) = c("shrimp","conger_eel","tuna","squid","sea_urchin","salmon_roe","egg","fatty flesh","tuna_roll","cucumber")

@@ -114,8 +114,12 @@ if(with_test_flag) {
 }
 
 # 実際にテストする。
-for(i in 1:nrow(data_sampled)){
+result = data.frame()
+# for(i in 1:nrow(data_sampled)){
+for (i in 1:3){
 	input_data = data_sampled[i, 1:5]
 	# アルゴリズムを分離して、テスト恒常性を高める。
-	testing_Algo(input_data, data)
+	result = rbind(result, testing_Algo(input_data, data))
+	# Result Viewer
 }
+print(result)

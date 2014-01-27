@@ -51,35 +51,42 @@ k_means = function(original, input_data, cluster = 8){
 # tester(フラグ, オリジナルデータ, サンプリング個数)
 # デフォルトでは、サンプリング個数は、1割。
 # 返り値について、
-tester = function(with_test_flag, data, sampler = nrow(data)/10){
+tester = function(data, sampler = nrow(data)/10){
+	warning("[Testing] Test Method is now activated...")
+	# 元のデータの保管
 	data_origin = data
-	sampled_row = sample(nrow(data),500)
+	# ランダムサンプリング
+	sampled_row = sample(nrow(data), sampler)
 	data_sampled = data[sampled_row,]
 	data = data[-sampled_row,]
+	
+	return(list(data, data_sampled, data_origin))
 }
 ##############################################################
+# 以下、ロジック
+##############################################################
+# それぞれの環境に合わせたデータフォルダの適用
 source("../local.r",encoding='utf-8')
 
 # 順位化データの読みこみ
 use_column = c(3, 4, 6, 9, 12, 13:22)
 data = data_reader(use_column)
 
-
-# test Session
-with_test_flag = as.integer(readline(prompt = "[Test Flag] Do you want to suggest with test?(Yes = 1, No = 0)> "))
-if(is.na(with_test_flag)) with_test_flag = 0
-
-# If this Session is non-interactive session, I'll use arguments.
-input_data["sex"] = as.integer(readline(prompt = "Please, Enter your Sex...(M = 0, F = 1)> "))
-
-input_data["age"] = as.integer(readline(prompt = "Please, Enter your Age...(-20 = 0, 20- = 1, 30- = 2, 40- = 3, 50- = 4, 60- = 5)> "))
-
-input_data["pref_u15"] = as.integer(readline(prompt = "Please Enter where had you lived in? (Answer in Pref Number)> "))
-
-input_data["pref_now"] = as.integer(readline(prompt = "Please Enter where do you live in? (Answer in Pref Number)> "))
-
-if (input_data == input_data) equivalent = 0 else equivalent = 1
-
-#"Sex","Age","pref_u15","pref_now","equivalent"
+# 入力データの管理
+# 初期化には、あり得ないデータを突っ込む
+input_data = rep(-1,5)
 names(input_data) = c("sex", "age", "pref_u15", "pref_now", "equivalent")
+
+# Test Session Confirm
+with_test_flag = c(NA)
+# with_test_flag = as.integer(readline(prompt = "[Test Flag] Do you want to suggest with test?(Yes = 1, No = 0)> "))
+if(is.na(with_test_flag)) with_test_flag = 1
+
+if(with_test_flag) {
+	temp_reciver = tester(data)
+	# return(list(data, data_sampled, data_origin))
+	data = temp_reciver[[1]]
+	data_sampled = temp_reciver[[2]]
+	data_origin = temp_reciver[[3]]
+}
 

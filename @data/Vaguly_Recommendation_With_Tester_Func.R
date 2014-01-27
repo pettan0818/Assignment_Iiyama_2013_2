@@ -5,8 +5,11 @@
 # 
 testing_Algo = function(input_data, data){
 	# 取り出しは、全部一致
-	# [FIXME] なんかおかしいぞ
-	terms = (data[,1] == input_data[1]) & (data[,2] == input_data[2]) & (data[,3] == input_data[3]) & (data[,4] == input_data[4]) & (data[,5] == input_data["equivalent"])
+	# [FIXME] 論理演算が全行にいってない。。。
+	# As.integerでかいけつしたっぽい
+	
+	terms = data[,1] == as.integer(input_data["sex"]) & data[,2] == as.integer(input_data["age"]) & data[,3] == as.integer(input_data["pref_u15"]) & data[,4] == as.integer(input_data["pref_now"]) & data[,5] == as.integer(input_data["equivalent"])
+	# print(terms)
 	ans_data = data[terms,]
 	
 	# データベースに一致がないとき、K近傍法で処理する。
@@ -15,16 +18,17 @@ testing_Algo = function(input_data, data){
 		ans_data =  k_means(data, input_data, 8)
 	}
 	
-	print(summary(ans_data))
+	# print(summary(ans_data))
 	
 	# アルゴリズム適用部
 	ranked = apply(ans_data[,6:15],2,mean)
 	
 	# それぞれのネタに順位番号を格納。
+	# かなり悩んだのでWikiにあげた
 	returner_ranked = c(1:10)
 	returner_ranked[sort.int(ranked, index.return=T)$ix] = 1:10
 	
-	return(ranked)
+	return(returner_ranked)
 }
 
 # Utility Functions
@@ -60,8 +64,8 @@ k_means = function(original, input_data, cluster = 8){
 	k_class = kmeans(user_data, cluster)
 	cluster_data = k_class$cluster
 	# For Debug
-	print(head(cluster_data,100))
-	print(table(cluster_data))
+	#print(head(cluster_data,100))
+	#print(table(cluster_data))
 	# 与えられたデータのクラスタ番号のみ抽出
 	input_cluster = k_class$cluster[user_data_row]
 	# 元々のデータのクラスタ番号を抽出
@@ -120,14 +124,19 @@ if(with_test_flag) {
 
 # 実際にテストする。
 result = data.frame()
-# for(i in 1:nrow(data_sampled)){
-for (i in 1:3){
+for(i in 1:nrow(data_sampled)){
+#for (i in 1:3){
 	input_data = data_sampled[i, 1:5]
 	# アルゴリズムを分離して、テスト恒常性を高める。
 	# result変数に、毎回の順位を格納。
 	result = rbind(result, testing_Algo(input_data, data))
+	print("Done")
 }
 
 # Result Viewer
 # コラムデータが化けるので、リセット
 colnames(result) = c("shrimp","conger_eel","tuna","squid","sea_urchin","salmon_roe","egg","fatty flesh","tuna_roll","cucumber")
+
+# 合致率を求めていく。
+print(result == data_sampled[1:nrow(data_sampled),6:15])
+table(result == data_sampled[1:nrow(data_sampled),6:15])

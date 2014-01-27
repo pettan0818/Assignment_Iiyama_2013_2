@@ -2,9 +2,11 @@
 
 # This file only includes test method...
 # Object Algorithm
+testing_Algo = function(){
+	
+}
 
-
-# Utility
+# Utility Functions
 ###################################################################
 # Data_Reader
 # 使う列数さえ指定してくれれば、自動で、名前もつけて返します。
@@ -53,7 +55,7 @@ k_means = function(original, input_data, cluster = 8){
 # ホールドアウト検定用の関数
 # tester(フラグ, オリジナルデータ, サンプリング個数)
 # デフォルトでは、サンプリング個数は、1割。
-# 返り値について、サンプルデータ除去済み生データ、サンプルデータ、生データの順番で返す。
+# 返り値について、サンプルデータ除去済み生データ、サンプルデータ、生データの順番で作ったリストで返す。
 test_data_maker = function(data, sampler = nrow(data)/10){
 	warning("[Testing] Test Method is now activated...")
 	# 元のデータの保管

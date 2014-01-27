@@ -11,8 +11,9 @@ analyzer_session = function(a, b, c, d){
 # 返り値は、同クラスタの人々のデータ
 k_means = function(original, input_data, cluster = 8){
 	# ユーザーの特徴量の切り出し
-	# 5001行目のユーザーが今回入力されたデータ
+	# 元々のデータ+1行目のユーザーが今回入力されたデータ
 	user_data = rbind(data[,c(1,2,3,4,5)],input_data)
+	user_data_row = nrow(data)+1
 	
 	# クラスタリング(8個のクラスタによるK近傍法)執行
 	# 与えられたデータをデータベースに追加した上で、分類実行。
@@ -22,9 +23,9 @@ k_means = function(original, input_data, cluster = 8){
 	print(head(cluster_data,100))
 	print(table(cluster_data))
 	# 与えられたデータのクラスタ番号のみ抽出
-	input_cluster = k_class$cluster[5001]
+	input_cluster = k_class$cluster[user_data_row]
 	# 元々のデータのクラスタ番号を抽出
-	cluster_data = cluster_data[-5001]
+	cluster_data = cluster_data[-user_data_row]
 	
 	# 同クラスタのデータ抽出
 	same_cluster_users = data[cluster_data == input_cluster,]

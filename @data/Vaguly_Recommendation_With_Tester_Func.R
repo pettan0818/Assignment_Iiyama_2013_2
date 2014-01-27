@@ -1,6 +1,8 @@
 # Vaguly_Recommendation With Aggressive Function maker...
 
-# This file includes test method...
+# This file only includes test method...
+# Object Algorithm
+
 
 # Utility
 ###################################################################
@@ -26,8 +28,9 @@ analyzer_session = function(a, b, c, d){
 # 返り値は、同クラスタの人々のデータ
 k_means = function(original, input_data, cluster = 8){
 	# ユーザーの特徴量の切り出し
-	# 5001行目のユーザーが今回入力されたデータ
+	# 元々のデータ+1行目のユーザーが今回入力されたデータ
 	user_data = rbind(data[,c(1,2,3,4,5)],input_data)
+	user_data_row = nrow(data)+1
 	
 	# クラスタリング(8個のクラスタによるK近傍法)執行
 	# 与えられたデータをデータベースに追加した上で、分類実行。
@@ -37,9 +40,9 @@ k_means = function(original, input_data, cluster = 8){
 	print(head(cluster_data,100))
 	print(table(cluster_data))
 	# 与えられたデータのクラスタ番号のみ抽出
-	input_cluster = k_class$cluster[5001]
+	input_cluster = k_class$cluster[user_data_row]
 	# 元々のデータのクラスタ番号を抽出
-	cluster_data = cluster_data[-5001]
+	cluster_data = cluster_data[-user_data_row]
 	
 	# 同クラスタのデータ抽出
 	same_cluster_users = data[cluster_data == input_cluster,]
@@ -50,8 +53,8 @@ k_means = function(original, input_data, cluster = 8){
 # ホールドアウト検定用の関数
 # tester(フラグ, オリジナルデータ, サンプリング個数)
 # デフォルトでは、サンプリング個数は、1割。
-# 返り値について、
-tester = function(data, sampler = nrow(data)/10){
+# 返り値について、サンプルデータ除去済み生データ、サンプルデータ、生データの順番で返す。
+test_data_maker = function(data, sampler = nrow(data)/10){
 	warning("[Testing] Test Method is now activated...")
 	# 元のデータの保管
 	data_origin = data
@@ -59,7 +62,7 @@ tester = function(data, sampler = nrow(data)/10){
 	sampled_row = sample(nrow(data), sampler)
 	data_sampled = data[sampled_row,]
 	data = data[-sampled_row,]
-	
+	# 複数返り値の場合は、リストにしてかえす
 	return(list(data, data_sampled, data_origin))
 }
 ##############################################################
@@ -82,11 +85,21 @@ with_test_flag = c(NA)
 # with_test_flag = as.integer(readline(prompt = "[Test Flag] Do you want to suggest with test?(Yes = 1, No = 0)> "))
 if(is.na(with_test_flag)) with_test_flag = 1
 
+# テストする場合は、まず、それ用のデータを作る。
 if(with_test_flag) {
-	temp_reciver = tester(data)
-	# return(list(data, data_sampled, data_origin))
+	temp_reciver = test_data_maker(data)
 	data = temp_reciver[[1]]
 	data_sampled = temp_reciver[[2]]
 	data_origin = temp_reciver[[3]]
+	# よく分からないものはさっさと殺す。
+	rm(temp_reciver)
+}
+
+# 実際にテストする。
+for(i in 1:nrow(data_sampled)){
+	input_data = data_sampled[i, 1:5]
+	# アルゴリズムを分離して、テスト恒常性を高める。
+	
+	
 }
 

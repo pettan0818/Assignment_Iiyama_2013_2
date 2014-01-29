@@ -230,6 +230,7 @@ for(i in 1:nrow(data_sampled)){
 	# アルゴリズムを分離して、テスト恒常性を高める。
 	# result変数に、毎回の順位を格納。
 	temp = testing_Algo(input_data, data, 8)
+	#print(temp)
 	result = rbind(result, temp)
 }
 

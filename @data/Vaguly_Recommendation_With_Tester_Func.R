@@ -2,26 +2,92 @@
 
 # This file only includes test method...
 # Object Algorithm
-# 
-testing_Algo = function(input_data, data){
+
+###
+# アルゴリズムのユーティリティ
+###
+
+# 距離測定関数(返り値: 重み付け用の数値を返す。)
+# 引数: 推定する特徴量, データベースとの一致, 重み付けに変更する際の方法(逆数 == reciprocal, 自然対数 == ln), 距離の種類
+dist_calc = function(input_data, ans_data, method_multipler = "ln", method_dist = "canberra"){
+	# 特徴量の抽出と被験者の挿入。
+	dist_source = rbind(input_data, ans_data[,1:5])
+	# 実際に距離を求める。
+	dist_ans_input = dist(dist_source, method = method_dist)
+	# dist型は、一旦数列に置き換得ると幸せに。今回は、被験者を1番目に入れたので、1行目を取ってくる。
+	# applyでつまるので、データフレームに。
+	dist_ans_input = data.frame(as.matrix(dist_ans_input)[1,-1])
+	
+	# 重み付け変換
+	# 逆数で変換
+	if(method_multipler == "reciprocal"){
+		return(1/(dist_ans_input+1)[[1]])
+		# 自然対数で変換。
+	}else if(method_multipler == "ln"){
+		# dist_ans_input[[1]]は、expを掛ける際に、リスト化されているので、解除する。
+		return(exp(dist_ans_input[[1]])*-1)
+		# Finally
+	}else{
+		return(ans_data)
+	}
+}
+
+# 順位を元にした寿司の人気度指数変換関数。(返り値: それぞれの寿司ネタの人気度指数)
+# 引数: 元々のデータ、重み付け変数、点数化パターン
+point_convert = function(ans_data, ans_weight = NA, point_pattern = "regular"){
+	# 順位ごとの基本値を作成
+	# 通常
+	if (point_pattern == "regular"){
+		point_pattern = seq(100, 10, length = 10)
+	# 二次関数
+	}else if(point_pattern == "quad"){
+		point_pattern = seq(10, 1, length = 10)
+		point_pattern = point_pattern^2
+	}else{
+		point_pattern = seq(100, 10, length = 10)
+	}
+	
+	# Point作成
+	point_ans = ans_data[,6:15]
+	
+	for(i in 1:ncol(point_ans)){
+		for(t in 1:nrow(point_ans)){
+			point_ans[t,i] = point_pattern[point_ans[t,i]]*ans_weight[t]
+		}
+	}
+	ans_data[,6:15] = point_ans
+	return(ans_data)
+}
+
+###
+# アルゴリズム本体
+###
+testing_Algo = function(input_data, data, k_cluster = 8){
 	# 取り出しは、全部一致
 	# [FIXME] 論理演算が全行にいってない。。。
 	# As.integerでかいけつしたっぽい
 	
 	terms = data[,1] == as.integer(input_data["sex"]) & data[,2] == as.integer(input_data["age"]) & data[,3] == as.integer(input_data["pref_u15"]) & data[,4] == as.integer(input_data["pref_now"]) & data[,5] == as.integer(input_data["equivalent"])
-	# print(terms)
+	# 近傍法のみでやる
+	#terms=FALSE
 	ans_data = data[terms,]
 	
 	# データベースに一致がないとき、K近傍法で処理する。
 	if (nrow(ans_data) == 0){
 		warning("[Attention] Found 0 Consensus, Using K_means...")
-		ans_data =  k_means(data, input_data, 8)
+		ans_data =  k_means(data, input_data, k_cluster)
+		# とりあえず、逆数で距離計算。
+		ans_weight = dist_calc(input_data, ans_data)
+		ans_data = point_convert(ans_data, ans_weight,"Regular")
 	}
 	
-	# print(summary(ans_data))
-	
+	tabler = function(data){
+		test = table(data)
+		return(as.integer((names(sort(test)[10]))))
+	}
 	# アルゴリズム適用部
 	ranked = apply(ans_data[,6:15],2,mean)
+	#ranked = apply(ans_data[,6:15],2,tabler)
 	
 	# それぞれのネタに順位番号を格納。
 	# かなり悩んだのでWikiにあげた
@@ -31,8 +97,10 @@ testing_Algo = function(input_data, data){
 	return(returner_ranked)
 }
 
+###
 # Utility Functions
-###################################################################
+###
+
 # Data_Reader
 # 使う列数さえ指定してくれれば、自動で、名前もつけて返します。
 data_reader = function(use_column){
@@ -92,9 +160,42 @@ test_data_maker = function(data, sampler = nrow(data)/10){
 	# 複数返り値の場合は、リストにしてかえす
 	return(list(data, data_sampled, data_origin))
 }
-##############################################################
+
+# 成績表示関数(返り値:なし)
+# 解答データを引数にとる。
+result_view = function(result){
+	# コラムデータが化けるので、リセット
+	colnames(result) = c("shrimp","conger_eel","tuna","squid","sea_urchin","salmon_roe","egg","fatty flesh","tuna_roll","cucumber")
+	
+	# 全体合致率
+	print("AllOver Rate")
+	# 合致するかどうかの論理演算
+	rate_data = table(result == data_sampled[1:nrow(data_sampled),6:15])
+	print(rate_data)
+	
+	print(as.integer(rate_data[2])/{as.integer(rate_data[1])+as.integer(rate_data[2])}*100)
+	
+	# 特定順位の正答率算定
+	# 4以上をNAにする。
+	print("Specific Rate")
+	remover = function(data){
+		# 複数条件は、ifの括弧の中に論理演算子で追加のこと
+		if(data > 3) data = NA
+		return(data)
+	}
+	# 二重ループの必要なし!
+	removed_result = apply(result, c(1, 2), remover)
+	
+	rate_data = table(removed_result == data_sampled[1:nrow(data_sampled),6:15], useNA = "always")
+	print(rate_data)
+	
+	print(as.integer(rate_data[2])/{as.integer(rate_data[1])+as.integer(rate_data[2])}*100)
+}
+
+###
 # 以下、ロジック
-##############################################################
+###
+
 # それぞれの環境に合わせたデータフォルダの適用
 source("../local.r",encoding='utf-8')
 
@@ -125,18 +226,12 @@ if(with_test_flag) {
 # 実際にテストする。
 result = data.frame()
 for(i in 1:nrow(data_sampled)){
-#for (i in 1:3){
 	input_data = data_sampled[i, 1:5]
 	# アルゴリズムを分離して、テスト恒常性を高める。
 	# result変数に、毎回の順位を格納。
-	result = rbind(result, testing_Algo(input_data, data))
-	print("Done")
+	temp = testing_Algo(input_data, data, 8)
+	result = rbind(result, temp)
 }
 
-# Result Viewer
-# コラムデータが化けるので、リセット
-colnames(result) = c("shrimp","conger_eel","tuna","squid","sea_urchin","salmon_roe","egg","fatty flesh","tuna_roll","cucumber")
-
-# 合致率を求めていく。
-print(result == data_sampled[1:nrow(data_sampled),6:15])
-table(result == data_sampled[1:nrow(data_sampled),6:15])
+# リザルト表示
+result_view(result)
